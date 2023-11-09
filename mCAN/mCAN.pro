@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     m_can_task.cpp \
+    m_canconfig.cpp \
     main.cpp \
     m_canwidget.cpp
 
@@ -23,6 +24,7 @@ HEADERS += \
     canlib/zlgcan/zlgcan_x86/typedef.h \
     canlib/zlgcan/zlgcan_x86/zlgcan.h \
     m_can_task.h \
+    m_canconfig.h \
     m_canwidget.h \
     util_include/mc_util_include.h
 

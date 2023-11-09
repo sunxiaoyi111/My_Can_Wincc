@@ -1,5 +1,4 @@
 #include "m_can_task.h"
-
 M_Can_Task::M_Can_Task()
 {
     qDebug()<<"init";
@@ -12,12 +11,12 @@ M_Can_Task::~M_Can_Task()
 
 int M_Can_Task::open_device_test()
 {
+    //将定义都拿到了开头 为了能够正常的使用goto语句
     DEVICE_HANDLE dhandle;
     CHANNEL_HANDLE chHandle;
     ZCAN_Transmit_Data frame;
     ZCAN_CHANNEL_INIT_CONFIG cfg;
     BYTE data[] = {1, 2, 3, 4, 5, 6, 7, 8};
-
 
     //ZCAN_USBCAN_2E_U 为设备类型, 请根据实际修改
     dhandle = ZCAN_OpenDevice(ZCAN_USBCAN_2E_U, 0, 0);
