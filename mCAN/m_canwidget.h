@@ -2,7 +2,7 @@
 #define M_CANWIDGET_H
 
 #include <QWidget>
-
+#include <QThread>
 #include "m_can_task.h"
 
 
@@ -20,9 +20,14 @@ class M_CANWidget : public QWidget
 public:
     M_CANWidget(QWidget *parent = nullptr);
     ~M_CANWidget();
-
+signals:
+    int sig_in_num(int try_in);
+public slots:
+    int  ret_any_in(int in);
 private:
     Ui::M_CANWidget *ui;
-    M_Can_Task * can;
+    M_Can_Task * m_can;
+    QThread *my_Can_Thread;
+
 };
 #endif // M_CANWIDGET_H
