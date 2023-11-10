@@ -15,3 +15,5 @@
 ####参考文档 项目
 [CANas :一个非常好用的类 CANOE 工具](https://blog.csdn.net/lushoumin/article/details/70209954/ "https://blog.csdn.net/lushoumin/article/details/70209954/")
 [ZLG CAN 二次开发手册]()
+
+####修改描述文件
