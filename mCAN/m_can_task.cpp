@@ -2,6 +2,8 @@
 M_Can_Task::M_Can_Task()
 {
     qDebug()<<"init";
+
+
 }
 
 M_Can_Task::~M_Can_Task()
@@ -166,8 +168,53 @@ void M_Can_Task::mct_DataRecive()
         {
             len = ZCAN_Receive(mct_chHandle, can_data, len, 50);
 //            AddData(can_data, len);
+             //在这里抛出数据
+             //一部分直接放到数据库、显示
+             //一部分需要需要存到缓存区 用于另一个Timer中的UI交互
             qDebug()<<can_data<<"len="<<len;
+            M_CanDataBase mcd;
+            mcd.mcd_canID = can_data[0].frame.can_id;
+            emit sendElement(mcd);
         }
     }
+}
 
+int M_Can_Task::mct_DataTransmitBlock(uint32_t can_id,uint8_t * data,uint8_t length)
+{
+    ZCAN_Transmit_Data frame;
+    memset(&frame, 0, sizeof(frame));
+    //标准帧 数据帧 CAN帧
+    frame.frame.can_id = MAKE_CAN_ID(can_id, 0, 0, 0);
+    frame.frame.can_dlc = 8;
+//    BYTE data[] = {1, 2, 3, 4, 5, 6, 7, 8};
+    memcpy(frame.frame.data, data, length);
+    if (ZCAN_Transmit(mct_chHandle, &frame, 1) != 1)
+    {
+        qDebug() << "发送数据失败" ;
+        return STATUS_ERR;
+    }
+    return STATUS_OK;
+}
+void M_Can_Task::receiveElement(M_CanDataBase element)
+{
+    qDebug()<<"M_Can_Task::receiveElement";
+    qDebug()<<element.mcd_canID;
+}
+
+void M_Can_Task::mct_do_Rx_Task()
+{
+    ZCAN_Receive_Data can_data[100];
+    //    ZCAN_ReceiveFD_Data canfd_data[100];
+    UINT len = 0;
+    len = ZCAN_GetReceiveNum(mct_chHandle, TYPE_CAN);
+    if (len>0)
+    {
+        if(len>=100) len = 100;
+        len = ZCAN_Receive(mct_chHandle, can_data, len, 50);
+        //            AddData(can_data, len);
+        qDebug()<<can_data<<"len="<<len;
+        M_CanDataBase mcd;
+        mcd.mcd_canID = can_data[0].frame.can_id;
+        emit sendElement(mcd);
+    }
 }
