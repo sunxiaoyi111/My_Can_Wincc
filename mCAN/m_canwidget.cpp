@@ -51,6 +51,7 @@ M_CANWidget::M_CANWidget(QWidget *parent)
         {
             m_can->mct_close_device();
             ui->toolButton_DevConnect->setText("连接并启动");
+            m_can->isStart = false;
             if(my_Can_Thread->isRunning())
             {
 //                 CanSet->CanClose();
