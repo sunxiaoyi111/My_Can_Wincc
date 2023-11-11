@@ -12,8 +12,12 @@ public:
     ~m_canconfig();
 
     void m_canconfig_init();
+
+
+
 private:
     QString mcfg_bb;
+
 };
 
 #endif // M_CANCONFIG_H

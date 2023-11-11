@@ -1,11 +1,12 @@
 #ifndef M_CANWIDGET_H
 #define M_CANWIDGET_H
 
+#include <QObject>
 #include <QWidget>
 #include <QThread>
 #include "m_can_task.h"
 
-
+#include "m_candatabase.h"
 
 
 
@@ -24,10 +25,11 @@ signals:
     int sig_in_num(int try_in);
     //启动CAN接收
     void StartDataReceive();
-
+    void test_send(M_CanDataBase element);
 
 public slots:
     int  ret_any_in(int in);
+    void test_receive(M_CanDataBase element);
 private:
     Ui::M_CANWidget *ui;
     M_Can_Task * m_can;
