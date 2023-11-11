@@ -8,7 +8,6 @@ m_canconfig::~m_canconfig()
 {
 
 }
-
 void m_canconfig::m_canconfig_init()
 {
     // 获取程序的路径
