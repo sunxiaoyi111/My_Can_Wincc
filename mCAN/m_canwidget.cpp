@@ -23,6 +23,9 @@ M_CANWidget::M_CANWidget(QWidget *parent)
 
 
 
+    connect(this,&M_CANWidget::StartDataReceive,m_can,&M_Can_Task::mct_DataRecive);
+
+
 
 
     connect(ui->pushButton,&QPushButton::clicked,this,[=](){
@@ -38,12 +41,22 @@ M_CANWidget::M_CANWidget(QWidget *parent)
             if(ret == 0)
             {
                 ui->toolButton_DevConnect->setText("断开连接");
+                my_Can_Thread->start();
+                m_can->isStart = true;
+                 emit this->StartDataReceive();
             }
+
         }
         else
         {
             m_can->mct_close_device();
             ui->toolButton_DevConnect->setText("连接并启动");
+            if(my_Can_Thread->isRunning())
+            {
+//                 CanSet->CanClose();
+                 my_Can_Thread->quit();
+                 my_Can_Thread->wait();
+            }
         }
 //        int ret = 0 ;
 //        ret = sig_in_num(10);

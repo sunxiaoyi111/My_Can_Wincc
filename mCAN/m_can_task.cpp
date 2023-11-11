@@ -27,7 +27,7 @@ int M_Can_Task::open_device()
     //属性表
     //若为 CANFD 设备, 设置冲裁域波特率的 key 为 canfd_abit_baud_rate，数据域波特率为
     //canfd_dbit_baud_rate，请注意区分 CAN 和 CANFD 设备设置波特率的区别。
-    if (ZCAN_SetValue (mct_dhandle , "0/baud_rate", "1000000") != STATUS_OK)
+    if (ZCAN_SetValue (mct_dhandle , "0/baud_rate", "500000") != STATUS_OK)
     {
         mct_msgBox_Show("设置波特率失败\n已断开CAN盒连接");
         goto end;
@@ -61,6 +61,7 @@ int M_Can_Task::open_device()
 //        mct_msgBox_Show("发送数据失败\n已断开CAN盒连接");
 //        goto end;
 //    }
+
     return 0 ;
 end:
     ZCAN_CloseDevice(mct_dhandle);
@@ -156,17 +157,17 @@ int M_Can_Task::mct_close_device()
 void M_Can_Task::mct_DataRecive()
 {
     ZCAN_Receive_Data can_data[100];
-    ZCAN_ReceiveFD_Data canfd_data[100];
-    UINT len;
+//    ZCAN_ReceiveFD_Data canfd_data[100];
+    UINT len = 0;
     while(isStart)
     {
-        if (len = ZCAN_GetReceiveNum(mct_chHandle, TYPE_CAN))
+        len = ZCAN_GetReceiveNum(mct_chHandle, TYPE_CAN);
+        if (len>0&&len<100)
         {
-            len = ZCAN_Receive(mct_chHandle, can_data, 100, 50);
+            len = ZCAN_Receive(mct_chHandle, can_data, len, 50);
 //            AddData(can_data, len);
-            qDebug()<<can_data;
+            qDebug()<<can_data<<"len="<<len;
         }
-
     }
 
 }

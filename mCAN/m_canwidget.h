@@ -22,6 +22,10 @@ public:
     ~M_CANWidget();
 signals:
     int sig_in_num(int try_in);
+    //启动CAN接收
+    void StartDataReceive();
+
+
 public slots:
     int  ret_any_in(int in);
 private:
