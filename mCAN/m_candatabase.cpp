@@ -28,9 +28,11 @@ QString M_CanDataBase::mcd_getStringData()
         {
             str += QString("%1 ").arg( this->Data[i],2,16,QLatin1Char('0'));
         }
-
         // strData = str;
-
         return str;
     }
+}
+int M_CanDataBase::Len()
+{
+    return mcd_lenght;
 }

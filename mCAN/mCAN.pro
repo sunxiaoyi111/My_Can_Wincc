@@ -61,3 +61,9 @@ DEPENDPATH += $$PWD/canlib/zlgcan/zlgcan_x64
 
 
 INCLUDEPATH += $$PWD/util_include
+
+
+#禁用-Wunknown-pragmas 报警
+CONFIG += warn_off
+QMAKE_CXXFLAGS += -Wall
+QMAKE_CXXFLAGS += -Wno-unknown-pragmas

@@ -40,27 +40,29 @@ public:
     BYTE test_data[8] = {1, 2, 3, 4, 5, 6, 7, 8};
 
 
+
     QQueue<M_CanDataBase> mct_Tx;
     QQueue<M_CanDataBase> mct_Rx;
 
     int mct_DataTransmitBlock(uint32_t can_id,uint8_t * data,uint8_t length);
-    void mct_DataRecive();
 
     // 此函数仅用于构造示例 CAN 报文
     void get_can_frame(ZCAN_Transmit_Data& can_data, canid_t id);
     // 此函数仅用于构造示例 CANFD 报文
     void get_canfd_frame(ZCAN_TransmitFD_Data& canfd_data, canid_t id);
 
-    void mct_do_Rx_Task();
+    void mct_Recurring_Task();
     void mct_do_Tx_Task();
 
 private:
 
-//用来测试两个线程的队列交互
+
 signals:
-    void sendElement(M_CanDataBase element);
+    void mctask_sendElement(M_CanDataBase element);
+
 public slots:
-    void receiveElement(M_CanDataBase element);
+    void mctask_receiveElement(M_CanDataBase element);
+    void mctask_sendDataSequence(M_CanDataBase element);
 };
 
 #endif // M_CAN_TASK_H

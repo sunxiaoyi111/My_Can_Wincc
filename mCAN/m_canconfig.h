@@ -17,6 +17,10 @@ public:
 
 private:
     QString mcfg_bb;
+    QString mcfg_can_Device;
+    QString mcfg_can_Baudrate;
+    QString mcfg_can_indx;
+    QString mcfg_can_Channel;
 
 };
 

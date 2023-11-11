@@ -2,8 +2,6 @@
 M_Can_Task::M_Can_Task()
 {
     qDebug()<<"init";
-
-
 }
 
 M_Can_Task::~M_Can_Task()
@@ -53,6 +51,8 @@ int M_Can_Task::open_device()
         goto end;
     }
 
+
+#pragma region "发送数据测试" {
 //    memset(&mct_frame, 0, sizeof(mct_frame));
 //    mct_frame.frame.can_id = MAKE_CAN_ID(0x100, 1, 0, 0);
 //    mct_frame.frame.can_dlc = 8;
@@ -63,6 +63,7 @@ int M_Can_Task::open_device()
 //        mct_msgBox_Show("发送数据失败\n已断开CAN盒连接");
 //        goto end;
 //    }
+#pragma endregion}
 
     return 0 ;
 end:
@@ -70,7 +71,6 @@ end:
     qDebug()<<"end";
     return 1;
 }
-
 /**
  * @brief 打开CAN盒 锁定为CAN II 波特率500K 通道0
  * @brief 仅测试用
@@ -137,7 +137,13 @@ end:
     qDebug()<<"end";
     return 1;
 }
-
+/**
+ * @brief mct_msgBox_Show
+ * @brief can task 弹窗提示
+ * @param Na
+ * @param
+ * @return 设备打开结果  0 成功  Others :失败
+ */
 void M_Can_Task::mct_msgBox_Show(QString msg)
 {
     QMessageBox msg_Box;
@@ -145,7 +151,13 @@ void M_Can_Task::mct_msgBox_Show(QString msg)
     msg_Box.setText(msg);
     msg_Box.exec();
 }
-
+/**
+ * @brief 关闭CAN盒
+ * @brief
+ * @param Na
+ * @param
+ * @return 设备打开结果  0 成功  Others :失败
+ */
 int M_Can_Task::mct_close_device()
 {
     int ret = ZCAN_CloseDevice(mct_dhandle);
@@ -155,30 +167,13 @@ int M_Can_Task::mct_close_device()
     }
     return ret;
 }
-
-void M_Can_Task::mct_DataRecive()
-{
-    ZCAN_Receive_Data can_data[100];
-//    ZCAN_ReceiveFD_Data canfd_data[100];
-    UINT len = 0;
-    while(isStart)
-    {
-        len = ZCAN_GetReceiveNum(mct_chHandle, TYPE_CAN);
-        if (len>0&&len<100)
-        {
-            len = ZCAN_Receive(mct_chHandle, can_data, len, 50);
-//            AddData(can_data, len);
-             //在这里抛出数据
-             //一部分直接放到数据库、显示
-             //一部分需要需要存到缓存区 用于另一个Timer中的UI交互
-            qDebug()<<can_data<<"len="<<len;
-            M_CanDataBase mcd;
-            mcd.mcd_canID = can_data[0].frame.can_id;
-            emit sendElement(mcd);
-        }
-    }
-}
-
+/**
+ * @brief mct_DataTransmitBlock
+ * @brief 阻塞发送
+ * @param Na
+ * @param
+ * @return 设备打开结果  0 成功  Others :失败
+ */
 int M_Can_Task::mct_DataTransmitBlock(uint32_t can_id,uint8_t * data,uint8_t length)
 {
     ZCAN_Transmit_Data frame;
@@ -186,8 +181,14 @@ int M_Can_Task::mct_DataTransmitBlock(uint32_t can_id,uint8_t * data,uint8_t len
     //标准帧 数据帧 CAN帧
     frame.frame.can_id = MAKE_CAN_ID(can_id, 0, 0, 0);
     frame.frame.can_dlc = 8;
-//    BYTE data[] = {1, 2, 3, 4, 5, 6, 7, 8};
-    memcpy(frame.frame.data, data, length);
+    if(length<=8)
+    {
+        memcpy(frame.frame.data, data, length);
+    }
+    else
+    {
+        memcpy(frame.frame.data, data, 8);
+    }
     if (ZCAN_Transmit(mct_chHandle, &frame, 1) != 1)
     {
         qDebug() << "发送数据失败" ;
@@ -195,26 +196,49 @@ int M_Can_Task::mct_DataTransmitBlock(uint32_t can_id,uint8_t * data,uint8_t len
     }
     return STATUS_OK;
 }
-void M_Can_Task::receiveElement(M_CanDataBase element)
+/**
+ * @brief mctask_receiveElement
+ * @brief 接收到CAN报文发送该节点到其他线程
+ * @param Na
+ * @param
+ * @return 设备打开结果  0 成功  Others :失败
+ */
+void M_Can_Task::mctask_receiveElement(M_CanDataBase element)
 {
     qDebug()<<"M_Can_Task::receiveElement";
     qDebug()<<element.mcd_canID;
 }
-
-void M_Can_Task::mct_do_Rx_Task()
+void M_Can_Task::mctask_sendDataSequence(M_CanDataBase element)
 {
-    ZCAN_Receive_Data can_data[100];
-    //    ZCAN_ReceiveFD_Data canfd_data[100];
+    qDebug()<<"M_Can_Task::mctask_sendDataSequence";
+    qDebug()<<element.mcd_canID << ":append";
+    mct_Tx.append(element);
+}
+void M_Can_Task::mct_Recurring_Task()
+{
     UINT len = 0;
+    //从CAN盒缓存队列中获取当前通道的CAN报文数量
     len = ZCAN_GetReceiveNum(mct_chHandle, TYPE_CAN);
     if (len>0)
     {
-        if(len>=100) len = 100;
-        len = ZCAN_Receive(mct_chHandle, can_data, len, 50);
-        //            AddData(can_data, len);
-        qDebug()<<can_data<<"len="<<len;
-        M_CanDataBase mcd;
-        mcd.mcd_canID = can_data[0].frame.can_id;
-        emit sendElement(mcd);
+        ZCAN_Receive_Data can_data[len] ;
+        ZCAN_Receive(mct_chHandle, can_data, len, 50);
+//        M_CanDataBase mcd;
+//        mcd.mcd_canID = can_data[0].frame.can_id;
+//        这一句发送要写到独立的timer中去，来给界面或其他需要报文交互的地方处理
+//        emit mctask_receiveElement(mcd);
+    }
+    if(!mct_Tx.isEmpty())
+    {
+        int send_num = mct_Tx.size();
+        send_num = (send_num <= 10) ? send_num:10;
+        for(int loop_num = 0;loop_num<send_num;loop_num++)
+        {
+            M_CanDataBase can_d_tx = mct_Tx.head();
+            if(mct_DataTransmitBlock(can_d_tx.mcd_canID, can_d_tx.Data, can_d_tx.Len())==STATUS_OK)
+            {
+                mct_Tx.dequeue();
+            }
+        }
     }
 }
