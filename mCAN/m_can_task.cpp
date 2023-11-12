@@ -223,10 +223,10 @@ void M_Can_Task::mct_Recurring_Task()
     {
         ZCAN_Receive_Data can_data[len] ;
         ZCAN_Receive(mct_chHandle, can_data, len, 50);
-//        M_CanDataBase mcd;
-//        mcd.mcd_canID = can_data[0].frame.can_id;
+        M_CanDataBase mcd;
+        mcd.mcd_canID = can_data[0].frame.can_id;
 //        这一句发送要写到独立的timer中去，来给界面或其他需要报文交互的地方处理
-//        emit mctask_receiveElement(mcd);
+        emit mctask_sendElement(mcd);
     }
     if(!mct_Tx.isEmpty())
     {
