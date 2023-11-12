@@ -6,8 +6,7 @@
 #include <QMessageBox>
 #include <QMetaType>
 
-#include "m_candatabase.h"
-
+#include "m_canconfig.h"
 
 
 M_CANWidget::M_CANWidget(QWidget *parent)
@@ -33,7 +32,10 @@ M_CANWidget::M_CANWidget(QWidget *parent)
 
     //测试用信号连接
     connect(m_can,&M_Can_Task::mctask_sendElement,this,&M_CANWidget::test_receive);//,Qt::DirectConnection
-        //connect(this,&M_CANWidget::test_send,m_can,&M_Can_Task::mctask_receiveElement);
+    connect(ui->lineEdit,SIGNAL(textEdited(const QString&)),this,SLOT(OnTextEdit(const QString&)));//,Qt::DirectConnection
+
+    //lineEdit
+//connect(this,&M_CANWidget::test_send,m_can,&M_Can_Task::mctask_receiveElement);
 #pragma endregion}
     connect(ui->pushButton,&QPushButton::clicked,this,[=](){
         qDebug()<< "You clicked the button!";
@@ -46,6 +48,8 @@ M_CANWidget::M_CANWidget(QWidget *parent)
     });
     connect(ui->pushButton_2,&QPushButton::clicked,this,[=](){
         qDebug()<< "You clicked the button2!";
+
+
 //        M_CanDataBase  msg;
 //        msg.mcd_canID = 0x100;
 //        uint8_t data[8] = {1,2,3,4,5,6,7,8};
@@ -70,7 +74,6 @@ M_CANWidget::M_CANWidget(QWidget *parent)
                 m_can->mct_Rx_timer.start(100);
                 my_Can_Thread->start();
             }
-
         }
         else
         {
@@ -83,6 +86,50 @@ M_CANWidget::M_CANWidget(QWidget *parent)
             }
         }
     });
+
+    m_canconfig cfg;
+    cfg.m_canconfig_init();
+
+    //新建一个线程对象
+//    QThread * my_SQL_Thread = new QThread(this);
+//    //使用movetothread 方法，m_can_task类中的方法将在新的线程中执行
+//    data.moveToThread(my_SQL_Thread);
+//    my_SQL_Thread->start();
+
+    data.mcd_sqlconnect();
+
+    // 设置垂直头不可见
+    ui->tableView->verticalHeader()->setVisible(false);
+    // 设置序列状态表不可编辑
+    //ui->m_pSqlQueryTblView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // 设置表格宽度为等宽格式(表头可拖动)
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    // 设置表格宽度为等宽格式(表头不可拖动)
+    //ui->m_pSqlQueryTblView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // 设置整行选中
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    // 显示水平和垂直滚动条
+    ui->tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    ui->tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+//    QSqlQueryModel *model = new QSqlQueryModel;
+//    model->setQuery("select * from table where id in (select max(id) from table group by name)");
+
+    m_pSqlTableModel = new QSqlTableModel(this);
+    // 指定表名
+    m_pSqlTableModel->setTable("tbl_staff");
+    // 编辑保存策略
+    m_pSqlTableModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    // 查询整张表
+    m_pSqlTableModel->select();
+    // 表头
+//    InitHeaderTbl(m_pSqlTableModel);
+    m_pSqlTableModel->setHeaderData(0, Qt::Horizontal, QString::fromUtf8("工号"));
+    m_pSqlTableModel->setHeaderData(1, Qt::Horizontal, QString::fromUtf8("员工"));
+    m_pSqlTableModel->setHeaderData(2, Qt::Horizontal, QString::fromUtf8("工龄"));
+    m_pSqlTableModel->setHeaderData(3, Qt::Horizontal, QString::fromUtf8("部门"));
+     // 显示
+    ui->tableView->setModel(m_pSqlTableModel);
 }
 
 M_CANWidget::~M_CANWidget()
@@ -95,6 +142,23 @@ M_CANWidget::~M_CANWidget()
 void M_CANWidget::test_receive(M_CanDataBase element)
 {
     qDebug()<<element.mcd_canID;
+    data.mcd_sqladd();
+
+//    m_pSqlTableModel = new QSqlTableModel(this);
+//    // 指定表名
+//    m_pSqlTableModel->setTable("tbl_staff");
+//    // 编辑保存策略
+//    m_pSqlTableModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+//    // 查询整张表
+    m_pSqlTableModel->select();
+//    // 表头
+//    //    InitHeaderTbl(m_pSqlTableModel);
+//    m_pSqlTableModel->setHeaderData(0, Qt::Horizontal, QString::fromUtf8("工号"));
+//    m_pSqlTableModel->setHeaderData(1, Qt::Horizontal, QString::fromUtf8("员工"));
+//    m_pSqlTableModel->setHeaderData(2, Qt::Horizontal, QString::fromUtf8("工龄"));
+//    m_pSqlTableModel->setHeaderData(3, Qt::Horizontal, QString::fromUtf8("部门"));
+//    // 显示
+//    ui->tableView->setModel(m_pSqlTableModel);
 }
 /**
  * @brief lock_can_settings
@@ -114,4 +178,39 @@ void M_CANWidget::lock_can_settings()
     ui->comboBox_devicebaud->setEnabled(false);
     ui->comboBox_deviceindex->setEnabled(false);
     ui->comboBox_devicechannel->setEnabled(false);
+}
+void M_CANWidget::OnTextEdit(const QString &/*strText*/)
+{
+    QString strText = ui->lineEdit->text();
+
+    if (strText.isEmpty())
+    {
+        // 查找表中所有信息
+        m_pSqlTableModel->setTable("tbl_staff");
+        m_pSqlTableModel->select();
+        // 表头
+//        InitHeaderTbl(m_pSqlTableModel);
+    }
+    else if (strText.toInt() > 1 && strText.toInt() < 1099)
+    {
+        // 按数字查询
+        m_pSqlTableModel->setFilter(QString("id = %1").arg(strText.toInt()));
+        m_pSqlTableModel->select();
+        // 表头
+//        InitHeaderTbl(m_pSqlTableModel);
+    }
+    else if((strText.at(0) >= 'a' && strText.at(0) <= 'z') ||
+             (strText.at(0) >= 'A' && strText.at(0) <= 'Z'))
+    {
+        // 按字母查询
+        m_pSqlTableModel->setFilter(QString("name like '%1%' ").arg(strText));
+        m_pSqlTableModel->select();
+        // 表头
+//        InitHeaderTbl(m_pSqlTableModel);
+    }
+    else
+    {
+        // 删除表中原有内容
+//        DelContentTbl(m_pSqlTableModel);
+    }
 }
