@@ -1,4 +1,5 @@
 QT       += core gui
+QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,6 +13,7 @@ SOURCES += \
     m_can_task.cpp \
     m_canconfig.cpp \
     m_candatabase.cpp \
+    m_candatasql.cpp \
     main.cpp \
     m_canwidget.cpp
 
@@ -27,6 +29,7 @@ HEADERS += \
     m_can_task.h \
     m_canconfig.h \
     m_candatabase.h \
+    m_candatasql.h \
     m_canwidget.h \
     util_include/mc_util_include.h
 
