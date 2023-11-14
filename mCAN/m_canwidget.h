@@ -18,6 +18,8 @@
 #include <QMessageBox>
 #include <QSqlError>
 
+
+
 #include "m_candatabase.h"
 #include "m_candatasql.h"
 
@@ -36,19 +38,23 @@ public:
     ~M_CANWidget();
     m_canconfig init_config;
     M_CanDataSql data;
+
 signals:
     void test_send(M_CanDataBase element);
+    void send_Can_Data_Quence(M_CanDataBase element);
 public slots:
     void test_receive(M_CanDataBase element);
-    void OnTextEdit(const QString& strText);
+    void OnText_Filter_Edit(const QString& strText);
 
-
+    void pb_Device_Open();
+    void OnAsorDsSort();
 private:
     Ui::M_CANWidget *ui;
     M_Can_Task * m_can;
     QThread *my_Can_Thread;
     void lock_can_settings();
-    QSqlTableModel *m_pSqlTableModel;
+    void set_tablemodel_ui();
+    QSqlTableModel *m_pSqlTableModel = nullptr;
 
 };
 #endif // M_CANWIDGET_H

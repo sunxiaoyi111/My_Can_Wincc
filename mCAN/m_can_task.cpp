@@ -2,10 +2,27 @@
 M_Can_Task::M_Can_Task()
 {
     qDebug()<<"init";
-}
 
+
+
+    connect(&mct_CanRx_timer,&QTimer::timeout,this,[=](){
+//        qDebug()<< "timeout!";
+        static uint32_t num = 0;
+        while(!mct_Rx.isEmpty()){
+            num++;
+            mct_Rx.dequeue();
+             qDebug()<< num;
+
+        }
+
+    });
+    mct_CanRx_timer.start(20);
+
+
+}
 M_Can_Task::~M_Can_Task()
 {
+    mct_close_device();
     qDebug()<<"quit";
 }
 /**
@@ -160,11 +177,13 @@ void M_Can_Task::mct_msgBox_Show(QString msg)
  */
 int M_Can_Task::mct_close_device()
 {
+    if(mct_dhandle==nullptr) return STATUS_OK;
     int ret = ZCAN_CloseDevice(mct_dhandle);
     if(ret == STATUS_ERR)
     {
         mct_msgBox_Show("关闭设备操作失败");
     }
+    mct_dhandle = nullptr;
     return ret;
 }
 /**
@@ -206,16 +225,17 @@ int M_Can_Task::mct_DataTransmitBlock(uint32_t can_id,uint8_t * data,uint8_t len
 void M_Can_Task::mctask_receiveElement(M_CanDataBase element)
 {
     qDebug()<<"M_Can_Task::receiveElement";
-    qDebug()<<element.mcd_canID;
+    qDebug()<<element.id;
 }
 void M_Can_Task::mctask_sendDataSequence(M_CanDataBase element)
 {
     qDebug()<<"M_Can_Task::mctask_sendDataSequence";
-    qDebug()<<element.mcd_canID << ":append";
+    qDebug()<<element.id << ":append";
     mct_Tx.append(element);
 }
 void M_Can_Task::mct_Recurring_Task()
 {
+    static uint mums=0;
     UINT len = 0;
     //从CAN盒缓存队列中获取当前通道的CAN报文数量
     len = ZCAN_GetReceiveNum(mct_chHandle, TYPE_CAN);
@@ -223,10 +243,7 @@ void M_Can_Task::mct_Recurring_Task()
     {
         ZCAN_Receive_Data can_data[len] ;
         ZCAN_Receive(mct_chHandle, can_data, len, 50);
-        M_CanDataBase mcd;
-        mcd.mcd_canID = can_data[0].frame.can_id;
-//        这一句发送要写到独立的timer中去，来给界面或其他需要报文交互的地方处理
-        emit mctask_sendElement(mcd);
+        mct_AddData(can_data, len);
     }
     if(!mct_Tx.isEmpty())
     {
@@ -235,10 +252,34 @@ void M_Can_Task::mct_Recurring_Task()
         for(int loop_num = 0;loop_num<send_num;loop_num++)
         {
             M_CanDataBase can_d_tx = mct_Tx.head();
-            if(mct_DataTransmitBlock(can_d_tx.mcd_canID, can_d_tx.Data, can_d_tx.Len())==STATUS_OK)
+            if(mct_DataTransmitBlock(can_d_tx.id, can_d_tx.Data, can_d_tx.Len())==STATUS_OK)
             {
                 mct_Tx.dequeue();
+                mct_AddData(&can_d_tx);
             }
         }
     }
+}
+void M_Can_Task::mct_AddData(const ZCAN_Receive_Data *data, UINT len)
+{
+    for (UINT i = 0; i < len; ++i)
+    {
+        const ZCAN_Receive_Data& can = data[i];
+        const canid_t& id = can.frame.can_id;
+        M_CanDataBase *cdb = new M_CanDataBase();
+        cdb->SetTime(data->timestamp);
+        cdb->SetData(GET_ID(id),(unsigned char*)can.frame.data,can.frame.can_dlc,IS_EFF(id),IS_RTR(id));
+        mct_AddData(cdb);
+        delete cdb;
+    }
+}
+void M_Can_Task::mct_AddData(M_CanDataBase *cdb)
+{
+    cdb->SetTime(QDateTime::currentDateTime());
+    MyClass_Candata dt;
+    memcpy(&(dt.data[0]),&(cdb->Data[0]),8);
+    dt.id = cdb->id;
+    dt.time = cdb->sTime;
+    QVariant var = QVariant::fromValue(dt);
+    emit mctask_Rx_Variant(var);
 }

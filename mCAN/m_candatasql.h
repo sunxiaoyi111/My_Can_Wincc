@@ -10,6 +10,14 @@
 #include <QDir>
 #include <QDateTime>
 
+#include <QTimer>
+#include <QQueue>
+#include <QMutex>
+
+
+#include "m_candatabase.h"
+
+
 class M_CanDataSql: public QObject
 {
     Q_OBJECT // 添加Q_OBJECT宏
@@ -21,13 +29,19 @@ public:
     QString appDir;
     QString dbDir;
 //    QSqlQuery query;
-
+QMutex m_lock;
 
 
 
 
     bool mcd_sqlconnect();
     bool mcd_sqladd();
+    bool mcd_sqladd_candata(M_CanDataBase cd);
+    bool mcd_sqladd_candata_Variant(QVariant cd);
+    QTimer task_timer;
+    void mcd_Task();
+
+    QQueue<MyClass_Candata> mct_Rx;
 };
 
 #endif // M_CANDATASQL_H
