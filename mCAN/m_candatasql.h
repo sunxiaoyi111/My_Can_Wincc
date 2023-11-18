@@ -36,7 +36,6 @@ QMutex m_lock;
 
     bool mcd_sqlconnect();
     bool mcd_sqladd();
-    bool mcd_sqladd_candata(M_CanDataBase cd);
     bool mcd_sqladd_candata_Variant(QVariant cd);
     QTimer task_timer;
     void mcd_Task();

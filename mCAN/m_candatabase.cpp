@@ -34,8 +34,6 @@ int M_CanDataBase::Len()
 {
     return lenght;
 }
-
-
 void M_CanDataBase::SetData(uint id,unsigned char * data,int len,bool extend,bool remote)
 {
     this->id = id;
@@ -48,7 +46,6 @@ void M_CanDataBase::SetTime(QDateTime time)
 {
     this->Time = time;
 }
-
 void M_CanDataBase::SetTime(quint64 time)
 {
     this->sTime = time / 1000000.0;
