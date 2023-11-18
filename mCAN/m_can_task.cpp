@@ -2,9 +2,6 @@
 M_Can_Task::M_Can_Task()
 {
     qDebug()<<"init";
-
-
-
     connect(&mct_CanRx_timer,&QTimer::timeout,this,[=](){
 //        qDebug()<< "timeout!";
         static uint32_t num = 0;
@@ -16,9 +13,7 @@ M_Can_Task::M_Can_Task()
         }
 
     });
-    mct_CanRx_timer.start(20);
-
-
+    mct_CanRx_timer.start(200);
 }
 M_Can_Task::~M_Can_Task()
 {
@@ -213,6 +208,14 @@ int M_Can_Task::mct_DataTransmitBlock(uint32_t can_id,uint8_t * data,uint8_t len
         qDebug() << "发送数据失败" ;
         return STATUS_ERR;
     }
+
+    MyClass_Candata dt;
+    memcpy(&(dt.data[0]),&(data[0]),8);
+    dt.id = can_id;
+    dt.dir = 0;
+    QVariant var = QVariant::fromValue(dt);
+    emit mctask_Rx_Variant(var);
+
     return STATUS_OK;
 }
 /**
@@ -233,9 +236,16 @@ void M_Can_Task::mctask_sendDataSequence(M_CanDataBase element)
     qDebug()<<element.id << ":append";
     mct_Tx.append(element);
 }
+void M_Can_Task::mytask_sendSequence(QVariant cd)
+{
+    M_CanDataBase element;
+    MyClass_Candata data= cd.value<MyClass_Candata>();
+    element.id = data.id;
+    memcpy(element.data_can,data.data,8);
+    mct_Tx.append(element);
+}
 void M_Can_Task::mct_Recurring_Task()
 {
-    static uint mums=0;
     UINT len = 0;
     //从CAN盒缓存队列中获取当前通道的CAN报文数量
     len = ZCAN_GetReceiveNum(mct_chHandle, TYPE_CAN);
@@ -252,10 +262,10 @@ void M_Can_Task::mct_Recurring_Task()
         for(int loop_num = 0;loop_num<send_num;loop_num++)
         {
             M_CanDataBase can_d_tx = mct_Tx.head();
-            if(mct_DataTransmitBlock(can_d_tx.id, can_d_tx.Data, can_d_tx.Len())==STATUS_OK)
+               if(mct_DataTransmitBlock(can_d_tx.id, can_d_tx.data_can, can_d_tx.Len())==STATUS_OK)
             {
                 mct_Tx.dequeue();
-                mct_AddData(&can_d_tx);
+//                mct_AddData(&can_d_tx);
             }
         }
     }
@@ -269,7 +279,8 @@ void M_Can_Task::mct_AddData(const ZCAN_Receive_Data *data, UINT len)
         M_CanDataBase *cdb = new M_CanDataBase();
         cdb->SetTime(data->timestamp);
         cdb->SetData(GET_ID(id),(unsigned char*)can.frame.data,can.frame.can_dlc,IS_EFF(id),IS_RTR(id));
-        mct_AddData(cdb);
+//        mct_AddData(cdb);
+        mct_AddData(cdb,1);
         delete cdb;
     }
 }
@@ -277,9 +288,20 @@ void M_Can_Task::mct_AddData(M_CanDataBase *cdb)
 {
     cdb->SetTime(QDateTime::currentDateTime());
     MyClass_Candata dt;
-    memcpy(&(dt.data[0]),&(cdb->Data[0]),8);
+    memcpy(&(dt.data[0]),&(cdb->data_can[0]),8);
     dt.id = cdb->id;
     dt.time = cdb->sTime;
+    QVariant var = QVariant::fromValue(dt);
+    emit mctask_Rx_Variant(var);
+}
+void M_Can_Task::mct_AddData(M_CanDataBase *cdb,uint8_t dir)
+{
+    cdb->SetTime(QDateTime::currentDateTime());
+    MyClass_Candata dt;
+    memcpy(&(dt.data[0]),&(cdb->data_can[0]),8);
+    dt.id = cdb->id;
+    dt.time = cdb->sTime;
+    dt.dir = dir;
     QVariant var = QVariant::fromValue(dt);
     emit mctask_Rx_Variant(var);
 }

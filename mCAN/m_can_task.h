@@ -36,8 +36,8 @@ public:
 
     DEVICE_HANDLE mct_dhandle = nullptr;
     CHANNEL_HANDLE mct_chHandle = nullptr;
-    ZCAN_Transmit_Data mct_frame = {0};
-    ZCAN_CHANNEL_INIT_CONFIG mct_cfg = {0};
+    ZCAN_Transmit_Data mct_frame ;
+    ZCAN_CHANNEL_INIT_CONFIG mct_cfg ;
     BYTE test_data[8] = {1, 2, 3, 4, 5, 6, 7, 8};
 
     QQueue<M_CanDataBase> mct_Tx;
@@ -57,16 +57,17 @@ public:
     void mct_do_Tx_Task();
     void mct_AddData(const ZCAN_Receive_Data *data, UINT len);
     void mct_AddData(M_CanDataBase *data);
+    void mct_AddData(M_CanDataBase *data,uint8_t dir);
 private:
 
 
 signals:
     void mctask_0nSqlShow();
-    void mctask_Rx(M_CanDataBase cd);
     void mctask_Rx_Variant(QVariant cd);
 public slots:
     void mctask_receiveElement(M_CanDataBase element);
     void mctask_sendDataSequence(M_CanDataBase element);
+    void mytask_sendSequence(QVariant cd);
 };
 
 #endif // M_CAN_TASK_H

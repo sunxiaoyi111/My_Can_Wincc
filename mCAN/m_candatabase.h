@@ -29,7 +29,7 @@ public:
 
 protected:
     QString strData;
-    int lenght;
+    int lenght = 8;
 
 };
 struct MyClass_Candata {
@@ -38,5 +38,13 @@ struct MyClass_Candata {
     uint8_t dir  = 0; //1: rx  0: tx
     uint8_t data[8] = {0};
 };
+struct M_struct_CanRx {
+    uint32_t time = 0;
+    uint32_t id   = 0;
+    uint8_t  data[8] = {0};
+};
+
 Q_DECLARE_METATYPE(MyClass_Candata)
+Q_DECLARE_METATYPE(M_struct_CanRx)
+
 #endif // M_CANDATABASE_H
