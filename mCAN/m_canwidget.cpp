@@ -81,6 +81,8 @@ M_CANWidget::M_CANWidget(QWidget *parent)
 
     connect(&projectwindow,&ProjectWindow::mw_Send_Can_data_signal,m_can,&M_Can_Task::mytask_sendSequence);
 
+    connect(can_dispatcher,&Can_dispatcher::mc_singal_set_label_str,&projectwindow,&ProjectWindow::mw_slots_set_label_rx);
+
 #pragma endregion}
     //异步发送测试函数
     connect(ui->pushButton,&QPushButton::clicked,this,[=](){
@@ -243,6 +245,9 @@ void M_CANWidget::lock_can_settings()
     list_comboBox_Dir<<"全部方向"<<"Rx"<<"TX";
     ui->comboBox_Dir->addItems(list_comboBox_Dir);
 
+    QStringList list_comboBox_Can_Type;
+    list_comboBox_Can_Type<<"标准帧"<<"扩展帧";
+    ui->comboBox_Can_Type->addItems(list_comboBox_Can_Type);
 }
 
 /** 过滤 报文条件修改

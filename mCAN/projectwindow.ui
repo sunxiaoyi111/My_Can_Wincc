@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -28,64 +28,127 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_1_1">
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_1_1">
            <attribute name="title">
             <string>MRHD</string>
            </attribute>
-           <widget class="QPushButton" name="pushButton">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>70</y>
-              <width>91</width>
-              <height>24</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>PushButton</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_2">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>120</y>
-              <width>91</width>
-              <height>24</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>PushButton</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label">
-            <property name="geometry">
-             <rect>
-              <x>40</x>
-              <y>30</y>
-              <width>54</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_2">
-            <property name="geometry">
-             <rect>
-              <x>130</x>
-              <y>30</y>
-              <width>54</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0" colspan="3">
+             <widget class="QLabel" name="label_test">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3" rowspan="2">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="3">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>固定报文示例:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1" rowspan="2">
+             <widget class="QPushButton" name="pushButton_F_vol_ctrl">
+              <property name="text">
+               <string>前舱音量控制</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="4">
+             <widget class="QLabel" name="label_9">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="4" rowspan="2">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="2" rowspan="2">
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>4字节float</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0" rowspan="2">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>直接填充输入文本</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1" rowspan="3">
+             <widget class="QPushButton" name="pushButton_set_gain">
+              <property name="text">
+               <string>通道增益调节</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="3" rowspan="3">
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>1、绑定有效格式(正则 如需要)
+2、记住objectName
+3、绑定槽函数，转化并使用输入框数值</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
+             <widget class="QLineEdit" name="lineEdit_gain_byte4"/>
+            </item>
+            <item row="7" column="4">
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0" rowspan="2">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>常规需要转化</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1" rowspan="2">
+             <widget class="QPushButton" name="pushButton_set_gain_double">
+              <property name="text">
+               <string>通道增益调节_数值</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="2">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>直接输入数值</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="2">
+             <widget class="QLineEdit" name="lineEdit_gain_double"/>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="tab_4">
            <attribute name="title">
@@ -97,7 +160,7 @@
             <string>BPA02</string>
            </attribute>
           </widget>
-          <widget class="QWidget" name="tab_4">
+          <widget class="QWidget" name="tab_7">
            <attribute name="title">
             <string>BPA04</string>
            </attribute>

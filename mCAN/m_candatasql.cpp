@@ -73,7 +73,6 @@ bool M_CanDataSql::mcd_sqladd_candata_Variant(QVariant cd)
 }
 void  M_CanDataSql::mcd_Task()
 {
-    int rowCount =0;
     QSqlQuery query;
     m_lock.lock();
     if(!mct_Rx.isEmpty())
