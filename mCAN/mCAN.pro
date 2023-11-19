@@ -11,6 +11,8 @@ CONFIG += c++17
 
 SOURCES += \
     Candispatcher/can_dispatcher.cpp \
+    Candispatcher/canmessagebase.cpp \
+    Candispatcher/cansingalbase.cpp \
     m_can_task.cpp \
     m_canconfig.cpp \
     m_candatabase.cpp \
@@ -22,6 +24,8 @@ SOURCES += \
 HEADERS += \
     Candispatcher/can_dispatcher.h \
     Candispatcher/can_dispatcher_table.h \
+    Candispatcher/canmessagebase.h \
+    Candispatcher/cansingalbase.h \
     canlib/zlgcan/zlgcan_x64/canframe.h \
     canlib/zlgcan/zlgcan_x64/config.h \
     canlib/zlgcan/zlgcan_x64/typedef.h \

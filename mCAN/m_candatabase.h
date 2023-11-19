@@ -34,8 +34,8 @@ protected:
 };
 struct MyClass_Candata {
     uint32_t time;
-    int id = 0;
     uint8_t dir  = 0; //1: rx  0: tx
+    int id = 0;
     uint8_t data[8] = {0};
 };
 struct M_struct_CanRx {
@@ -46,5 +46,9 @@ struct M_struct_CanRx {
 
 Q_DECLARE_METATYPE(MyClass_Candata)
 Q_DECLARE_METATYPE(M_struct_CanRx)
-
+struct P_struct_Rx_Show {
+    uint id     = 0;
+    QString  str   ;
+};
+Q_DECLARE_METATYPE(P_struct_Rx_Show)
 #endif // M_CANDATABASE_H
